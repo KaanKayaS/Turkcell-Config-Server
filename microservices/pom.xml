@@ -21,6 +21,7 @@
         <module>user-service</module>
         <module>product-service</module>
         <module>eureka-server</module>
+        <module>gateway-server</module>
     </modules>
 
     <properties>
