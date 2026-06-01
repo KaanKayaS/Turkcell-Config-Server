@@ -5,8 +5,11 @@ spring:
     stream:
       bindings:
         testEvent-out-0:
-          destination: test-topic
-          content-type: application/json
+          destination: test-topic # hangi başlığa bu eventi göndereyim?
+          content-type: application/json # hangi tür ile göndereyim?
       kafka:
         binder:
           brokers: localhost:9092
+
+server:
+  port: 8082
