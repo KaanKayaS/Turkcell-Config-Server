@@ -29,6 +29,10 @@ public class ProductsController {
         // KAFKAYA bir event gidecekse, önce kayıt altına alınacak.
         // Outbox -> XEvent,XTarihi,XTopic,XPayload
         
+
+        // Daha sonra bir mekanizma bu kayıtları okuyacak ve kafkaya gönderecek.
+        // POLLING ->
+        // Debezium gibi bir mekanizma
         return "Başarılı";
     }
 }
