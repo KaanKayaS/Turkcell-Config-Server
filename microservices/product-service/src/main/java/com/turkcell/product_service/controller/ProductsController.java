@@ -21,8 +21,14 @@ public class ProductsController {
 
     @GetMapping
     public String test(@RequestParam String message) {
+        // ASLA!
         var event = new TestEvent(message, UUID.randomUUID());
         streamBridge.send("testEvent-out-0", event);
+        //
+
+        // KAFKAYA bir event gidecekse, önce kayıt altına alınacak.
+        // Outbox -> XEvent,XTarihi,XTopic,XPayload
+        
         return "Başarılı";
     }
 }
