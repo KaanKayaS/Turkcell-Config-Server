@@ -5,7 +5,7 @@ spring:
         config:
             server:
                 git: 
-                    uri: https://github.com/halitkalayci/Microservices-Spring-GYGY5.git
+                    uri: https://github.com/KaanKayaS/Turkcell-Config-Server.git
                     default-label: master
                     search-paths: microservices/configs,microservices/configs/{application}
                     clone-on-start: true
