@@ -14,6 +14,16 @@ spring:
               uri: lb://product-service
               predicates:
                 - Path=/api/products/**
+            - id: bff-auth
+              uri: lb://bff-service
+              predicates:
+                - Path=/api/auth/**
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/turkcell-microservices
+          jwk-set-uri: http://localhost:8180/realms/turkcell-microservices/protocol/openid-connect/certs
 
 server:
   port: 9090

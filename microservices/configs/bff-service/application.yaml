@@ -1,0 +1,15 @@
+server:
+  port: 9000
+
+keycloak:
+  auth-server-url: http://localhost:8180
+  realm: turkcell-microservices
+  client-id: bff-client
+  client-secret: ${BFF_CLIENT_SECRET:qLNZ5NsxJQlWBDe4Jz5cX2Xe9FGCTUoq}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
