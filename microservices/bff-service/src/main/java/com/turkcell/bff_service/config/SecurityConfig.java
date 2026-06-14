@@ -16,11 +16,13 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/proxy/**").permitAll()  // ProxyController kendi session kontrolünü yapıyor
                         .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/frontend/**").permitAll()
                         .anyRequest().authenticated()
                 );
 

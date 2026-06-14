@@ -1,7 +1,10 @@
+com\turkcell\bff_service\dto\AuthResponse.class
 com\turkcell\bff_service\dto\TokenResponse.class
 com\turkcell\bff_service\BffServiceApplication.class
+com\turkcell\bff_service\config\WebConfig.class
 com\turkcell\bff_service\dto\RefreshTokenRequest.class
 com\turkcell\bff_service\service\KeycloakAuthService.class
 com\turkcell\bff_service\config\SecurityConfig.class
 com\turkcell\bff_service\controller\AuthController.class
+com\turkcell\bff_service\controller\ProxyController.class
 com\turkcell\bff_service\dto\LoginRequest.class

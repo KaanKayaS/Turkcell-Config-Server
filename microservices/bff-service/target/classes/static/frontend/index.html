@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFF Auth Test — Turkcell Microservices</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a1f35;
+            --bg-card-hover: #1f2642;
+            --border: #2a3150;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.1);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.1);
+            --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.1);
+            --info: #3b82f6;
+            --info-bg: rgba(59, 130, 246, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background gradient */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(16, 185, 129, 0.04) 0%, transparent 50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding: 2rem 0;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6366f1, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.75rem;
+        }
+
+        .badge-success { background: var(--success-bg); color: var(--success); border: 1px solid rgba(16,185,129,0.2); }
+        .badge-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
+        .badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(245,158,11,0.2); }
+
+        /* Grid layout */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .grid-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Card */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.05);
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-title .icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        /* Login Form */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.65rem 1.25rem;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn:active { transform: scale(0.97); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        .btn-primary:hover { box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+        .btn-group {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        /* Storage Inspector */
+        .storage-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .storage-table th {
+            text-align: left;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .storage-table td {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.82rem;
+            border-bottom: 1px solid rgba(42, 49, 80, 0.5);
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
+
+        .storage-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .storage-empty {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        .token-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .token-found { background: var(--danger-bg); color: var(--danger); }
+        .token-safe { background: var(--success-bg); color: var(--success); }
+
+        /* Log Output */
+        .log-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            max-height: 350px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.78rem;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            padding: 0.25rem 0;
+            display: flex;
+            gap: 0.5rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .log-time { color: var(--text-muted); white-space: nowrap; }
+        .log-info { color: var(--info); }
+        .log-success { color: var(--success); }
+        .log-error { color: var(--danger); }
+        .log-warn { color: var(--warning); }
+
+        /* Status Indicator */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.4rem;
+        }
+
+        .status-dot.online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .status-dot.offline { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+
+        /* Pulse animation for status dot */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-dot.online { animation: pulse 2s infinite; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            .container { padding: 1rem; }
+            .header h1 { font-size: 1.5rem; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        .verdict-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: none;
+        }
+        .verdict-box.show { display: block; }
+        .verdict-pass {
+            background: var(--success-bg);
+            border: 1px solid rgba(16,185,129,0.3);
+            color: var(--success);
+        }
+        .verdict-fail {
+            background: var(--danger-bg);
+            border: 1px solid rgba(239,68,68,0.3);
+            color: var(--danger);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1>🔐 BFF Authentication Test</h1>
+        <p>Turkcell Microservices — Keycloak + BFF Pattern Demo</p>
+        <div id="authBadge" class="badge badge-danger">
+            <span class="status-dot offline"></span> Oturum Kapalı
+        </div>
+    </div>
+
+    <div class="grid">
+        <!-- Login Card -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon" style="background:var(--accent-glow);color:var(--accent);">🔑</div>
+                Giriş Yap
+            </div>
+            <div class="form-group">
+                <label for="username">Kullanıcı Adı</label>
+                <input type="text" id="username" value="testuser" placeholder="Kullanıcı adı">
+            </div>
+            <div class="form-group">
+                <label for="password">Şifre</label>
+                <input type="password" id="password" value="test1234" placeholder="Şifre">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="login()">🔐 Giriş Yap</button>
+                <button class="btn btn-danger" onclick="logout()">🚪 Çıkış Yap</button>
+                <button class="btn btn-outline" onclick="checkSession()">📋 Oturum Kontrol</button>
+            </div>
+        </div>
+
+        <!-- API Test Card -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon" style="background:var(--info-bg);color:var(--info);">🌐</div>
+                API Test
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">
+                BFF proxy üzerinden korumalı endpoint'lere erişim testi. Token session'dan otomatik eklenir.
+            </p>
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="callApi('/api/proxy/users')">👥 Users API</button>
+                <button class="btn btn-success" onclick="callApi('/api/proxy/products')">📦 Products API</button>
+                <button class="btn btn-outline" onclick="callDirectWithoutToken()">⛔ Token'sız Dene</button>
+            </div>
+        </div>
+
+        <!-- Cookie / Session Inspector -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon" style="background:var(--success-bg);color:var(--success);">🍪</div>
+                Cookie / Session Inspector
+            </div>
+            <table class="storage-table">
+                <thead>
+                    <tr><th>Anahtar</th><th>Değer</th><th>Durum</th></tr>
+                </thead>
+                <tbody id="cookieTable">
+                    <tr><td colspan="3" class="storage-empty">Henüz cookie yok</td></tr>
+                </tbody>
+            </table>
+            <button class="btn btn-outline" style="margin-top:1rem; width:100%;" onclick="refreshStorageView()">🔄 Yenile</button>
+        </div>
+
+        <!-- LocalStorage / SessionStorage Inspector -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon" style="background:var(--warning-bg);color:var(--warning);">💾</div>
+                LocalStorage & SessionStorage Inspector
+            </div>
+            <table class="storage-table">
+                <thead>
+                    <tr><th>Depolama</th><th>Anahtar</th><th>Değer</th></tr>
+                </thead>
+                <tbody id="storageTable">
+                    <tr><td colspan="3" class="storage-empty">Boş — Token burada saklanmıyor ✅</td></tr>
+                </tbody>
+            </table>
+
+            <div id="verdict" class="verdict-box"></div>
+        </div>
+
+        <!-- Log Output -->
+        <div class="card grid-full">
+            <div class="card-title">
+                <div class="icon" style="background:var(--info-bg);color:var(--info);">📜</div>
+                İstek Logları
+            </div>
+            <div class="log-container" id="logContainer">
+                <div class="log-entry">
+                    <span class="log-time">[--:--:--]</span>
+                    <span class="log-info">Sistem hazır. Giriş yaparak testi başlatın.</span>
+                </div>
+            </div>
+            <button class="btn btn-outline" style="margin-top:1rem;" onclick="clearLogs()">🗑️ Logları Temizle</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const BFF_BASE = ''; // Same origin (BFF serves this page)
+
+    // ─── Logging ───
+    function log(message, type = 'info') {
+        const container = document.getElementById('logContainer');
+        const now = new Date().toLocaleTimeString('tr-TR');
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerHTML = `<span class="log-time">[${now}]</span><span class="log-${type}">${message}</span>`;
+        container.appendChild(entry);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function clearLogs() {
+        document.getElementById('logContainer').innerHTML = '';
+        log('Loglar temizlendi.', 'info');
+    }
+
+    // ─── Auth Badge ───
+    function updateBadge(authenticated) {
+        const badge = document.getElementById('authBadge');
+        if (authenticated) {
+            badge.className = 'badge badge-success';
+            badge.innerHTML = '<span class="status-dot online"></span> Oturum Açık';
+        } else {
+            badge.className = 'badge badge-danger';
+            badge.innerHTML = '<span class="status-dot offline"></span> Oturum Kapalı';
+        }
+    }
+
+    // ─── Login ───
+    async function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        log(`POST /api/auth/login — Kullanıcı: ${username}`, 'info');
+
+        try {
+            const res = await fetch(BFF_BASE + '/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', // Cookie gönderimi için
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.authenticated) {
+                log(`✅ Giriş başarılı! Session ID: ${data.sessionId}`, 'success');
+                log(`📌 Dikkat: Response body'de access_token YOK — sunucuda saklandı!`, 'warn');
+                log(`📦 Response body: ${JSON.stringify(data)}`, 'info');
+                updateBadge(true);
+            } else {
+                log(`❌ Giriş başarısız: ${data.message || res.statusText}`, 'error');
+                updateBadge(false);
+            }
+        } catch (err) {
+            log(`❌ Bağlantı hatası: ${err.message}`, 'error');
+        }
+
+        refreshStorageView();
+    }
+
+    // ─── Logout ───
+    async function logout() {
+        log('POST /api/auth/logout', 'info');
+        try {
+            const res = await fetch(BFF_BASE + '/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include'
+            });
+            const data = await res.json();
+            log(`🚪 ${data.message}`, 'success');
+            updateBadge(false);
+        } catch (err) {
+            log(`❌ Çıkış hatası: ${err.message}`, 'error');
+        }
+        refreshStorageView();
+    }
+
+    // ─── Check Session ───
+    async function checkSession() {
+        log('GET /api/auth/me — Oturum durumu kontrol ediliyor...', 'info');
+        try {
+            const res = await fetch(BFF_BASE + '/api/auth/me', {
+                credentials: 'include'
+            });
+            const data = await res.json();
+            log(`📋 Durum: authenticated=${data.authenticated}, sessionId=${data.sessionId}`, data.authenticated ? 'success' : 'warn');
+            log(`💬 ${data.message}`, 'info');
+            updateBadge(data.authenticated);
+        } catch (err) {
+            log(`❌ Kontrol hatası: ${err.message}`, 'error');
+        }
+        refreshStorageView();
+    }
+
+    // ─── Call API via BFF Proxy ───
+    async function callApi(path) {
+        log(`GET ${path} — BFF proxy üzerinden (token session'dan eklenir)`, 'info');
+        try {
+            const res = await fetch(BFF_BASE + path, {
+                credentials: 'include'
+            });
+
+            if (res.ok) {
+                const data = await res.text();
+                log(`✅ ${res.status} OK — Yanıt: ${data.substring(0, 200)}`, 'success');
+            } else {
+                const text = await res.text();
+                log(`⚠️ ${res.status} ${res.statusText} — ${text.substring(0, 200)}`, 'error');
+            }
+        } catch (err) {
+            log(`❌ API hatası: ${err.message}`, 'error');
+        }
+    }
+
+    // ─── Call Gateway directly without token ───
+    async function callDirectWithoutToken() {
+        const url = 'http://localhost:9090/api/users';
+        log(`GET ${url} — Token OLMADAN doğrudan Gateway'e istek`, 'warn');
+        try {
+            const res = await fetch(url);
+            if (res.status === 401) {
+                log(`🔒 ${res.status} Unauthorized — Beklenen sonuç! Token olmadan erişim engellendi.`, 'success');
+            } else {
+                const text = await res.text();
+                log(`⚠️ ${res.status} — Beklenmeyen yanıt: ${text.substring(0, 200)}`, 'warn');
+            }
+        } catch (err) {
+            log(`❌ Bağlantı hatası (CORS veya ağ): ${err.message}`, 'error');
+        }
+    }
+
+    // ─── Storage Inspector ───
+    function refreshStorageView() {
+        // Cookies
+        const cookieTable = document.getElementById('cookieTable');
+        const cookies = document.cookie.split(';').filter(c => c.trim());
+
+        if (cookies.length === 0 || (cookies.length === 1 && cookies[0].trim() === '')) {
+            cookieTable.innerHTML = '<tr><td colspan="3" class="storage-empty">Cookie bulunamadı</td></tr>';
+        } else {
+            cookieTable.innerHTML = '';
+            cookies.forEach(cookie => {
+                const [key, ...val] = cookie.trim().split('=');
+                const value = val.join('=');
+                const isSession = key.trim().toUpperCase().includes('JSESSIONID') || key.trim().toUpperCase().includes('SESSION');
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${key.trim()}</strong></td>
+                    <td>${value || '<i>HttpOnly (görünmez)</i>'}</td>
+                    <td><span class="token-badge ${isSession ? 'token-safe' : ''}">${isSession ? '✅ Session Cookie' : 'Cookie'}</span></td>
+                `;
+                cookieTable.appendChild(tr);
+            });
+        }
+
+        // LocalStorage & SessionStorage
+        const storageTable = document.getElementById('storageTable');
+        const items = [];
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            items.push({ storage: 'localStorage', key, value: localStorage.getItem(key) });
+        }
+        for (let i = 0; i < sessionStorage.length; i++) {
+            const key = sessionStorage.key(i);
+            items.push({ storage: 'sessionStorage', key, value: sessionStorage.getItem(key) });
+        }
+
+        if (items.length === 0) {
+            storageTable.innerHTML = '<tr><td colspan="3" class="storage-empty">Boş — Token burada saklanmıyor ✅</td></tr>';
+        } else {
+            storageTable.innerHTML = '';
+            items.forEach(item => {
+                const hasToken = item.value && (item.value.includes('eyJ') || item.key.toLowerCase().includes('token'));
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.storage}</td>
+                    <td><strong>${item.key}</strong></td>
+                    <td>${hasToken ? '<span class="token-badge token-found">⛔ TOKEN BULUNDU!</span>' : item.value.substring(0, 50)}</td>
+                `;
+                storageTable.appendChild(tr);
+            });
+        }
+
+        // Verdict
+        const verdict = document.getElementById('verdict');
+        const hasTokenInStorage = items.some(i => i.value && (i.value.includes('eyJ') || i.key.toLowerCase().includes('token')));
+        const hasCookies = cookies.length > 0 && cookies[0].trim() !== '';
+
+        if (hasCookies || items.length > 0) {
+            verdict.classList.add('show');
+            if (!hasTokenInStorage) {
+                verdict.className = 'verdict-box show verdict-pass';
+                verdict.innerHTML = '✅ <strong>BFF Pattern Doğrulandı:</strong> Access token istemcide YOK. Sadece session cookie mevcut. Token sunucu tarafında güvenli şekilde saklanıyor.';
+            } else {
+                verdict.className = 'verdict-box show verdict-fail';
+                verdict.innerHTML = '⛔ <strong>Güvenlik Uyarısı:</strong> Access token istemci tarafında bulundu! Bu BFF pattern\'e aykırı.';
+            }
+        } else {
+            verdict.classList.remove('show');
+        }
+    }
+
+    // Initial load
+    refreshStorageView();
+</script>
+
+</body>
+</html>

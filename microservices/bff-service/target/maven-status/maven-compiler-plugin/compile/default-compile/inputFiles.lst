@@ -1,6 +1,9 @@
 C:\Users\Kaan\Desktop\ConfigServer\microservices\bff-service\src\main\java\com\turkcell\bff_service\BffServiceApplication.java
 C:\Users\Kaan\Desktop\ConfigServer\microservices\bff-service\src\main\java\com\turkcell\bff_service\config\SecurityConfig.java
+C:\Users\Kaan\Desktop\ConfigServer\microservices\bff-service\src\main\java\com\turkcell\bff_service\config\WebConfig.java
 C:\Users\Kaan\Desktop\ConfigServer\microservices\bff-service\src\main\java\com\turkcell\bff_service\controller\AuthController.java
+C:\Users\Kaan\Desktop\ConfigServer\microservices\bff-service\src\main\java\com\turkcell\bff_service\controller\ProxyController.java
+C:\Users\Kaan\Desktop\ConfigServer\microservices\bff-service\src\main\java\com\turkcell\bff_service\dto\AuthResponse.java
 C:\Users\Kaan\Desktop\ConfigServer\microservices\bff-service\src\main\java\com\turkcell\bff_service\dto\LoginRequest.java
 C:\Users\Kaan\Desktop\ConfigServer\microservices\bff-service\src\main\java\com\turkcell\bff_service\dto\RefreshTokenRequest.java
 C:\Users\Kaan\Desktop\ConfigServer\microservices\bff-service\src\main\java\com\turkcell\bff_service\dto\TokenResponse.java
